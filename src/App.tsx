@@ -1,25 +1,33 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { Story } from "./model/story.model";
+import Stories from "./pages/Stories";
 
 function App() {
+  const staticStories: Story[] = [
+    {
+      url: "https://picsum.photos/1080/1920",
+      type: "img",
+    },
+    {
+      url: "https://picsum.photos/1081/1921",
+      type: "img",
+    },
+    {
+      url: "https://picsum.photos/1082/1922",
+      type: "img",
+    },
+    {
+      url: "https://picsum.photos/1083/1923",
+      type: "img",
+    },
+  ];
+  
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Stories
+      stories={{
+        mode: "static",
+        static: staticStories,
+      }}
+    />
   );
 }
 
