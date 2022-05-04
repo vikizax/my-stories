@@ -26,15 +26,17 @@ export const ProgressWrapperContainer = styled.div`
   display: flex;
 `;
 
-export const ProgressItem = styled.div<{ progress?: number }>`
-  background-color: #fff;
-  height: 100%;
-  width: 100%;
-  border-radius: ${pxToRem(2)};
-  transform-origin: center left;
-  backface-visibility: hidden;
-  perspective: 1000;
-  /* width: ${({ progress = 0 }) => Math.trunc(progress)}%; */
-  transform: ${({ progress = 0 }) => `scaleX(${progress/100})`};
-  transition: transform 0.5 ease-in-out;
+export const ProgressItem = styled.div.attrs<{ scale: number }>(props => ({
+  style: {
+    transform: `scaleX(${props.scale / 100})`,
+  },
+}))`
+    background-color: #fff;
+    height: 100%;
+    width: 100%;
+    border-radius: ${pxToRem(2)};
+    transform-origin: center left;
+    backface-visibility: hidden;
+    perspective: 1000;
 `;
+

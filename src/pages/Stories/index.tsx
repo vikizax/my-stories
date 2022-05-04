@@ -11,12 +11,13 @@ import Progress from "../../container/Progress";
 const Stories = (props: StoryModel) => {
   const setStory = useSetRecoilState(storyAtom);
   const [progress, setProgress] = useRecoilState(progressAtom);
-  console.log(props.stories.static?.length);
+
   useEffect(() => {
     setStory(props);
     setProgress((prev) => ({
       ...prev,
       isLoading: true,
+      isMounted: false,
       total: props.stories.static?.length ?? 0,
     }));
   }, [props]);
@@ -27,6 +28,7 @@ const Stories = (props: StoryModel) => {
         ...prev,
         currentIndex: prev.currentIndex - 1,
         isLoading: true,
+        isMounted: false,
       }));
   };
 
@@ -40,6 +42,7 @@ const Stories = (props: StoryModel) => {
         ...prev,
         currentIndex: prev.currentIndex + 1,
         isLoading: true,
+        isMounted: false,
       }));
   };
 
