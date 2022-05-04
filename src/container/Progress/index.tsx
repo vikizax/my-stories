@@ -8,54 +8,39 @@ import {
   ProgressWrapperContainer,
 } from "./styles";
 
-// if (progress.status !== "paused" && progress.status !== "playing") {
-//   const progressIntervalInSecs = progress.interval / 1000;
-//   setIntervalSecs(progressIntervalInSecs);
-//   storyTimeInterval = setInterval(() => {
-//     if (timeTracker < progressIntervalInSecs)
-//       setTimeTracker((prev) => prev + 1);
-//     else {
-//       console.log("INTERVAL OVER -> Go to next story");
-//       // cleaer interval
-//       storyTimeInterval && clearInterval(storyTimeInterval);
-//     }
-//   }, progress.interval);
-// }
-
 const Progress = () => {
   const [story, setStory] = useRecoilState(storyAtom);
   const [progress, setProgress] = useRecoilState(progressAtom);
   const [timeTracker, setTimeTracker] = useState<number>(0);
-  // const [intervalSecs, setIntervalSecs] = useState<number>(1);
-  let animationFrameId = useRef<number>();
 
+  let animationFrameId = useRef<number>();
   let currentTimer = timeTracker;
-  const handleTimeTracker = () => {
-    setTimeTracker((time: number) => {
-      currentTimer = time + 100 / ((progress.interval / 1000) * 60);
-      return time + 100 / ((progress.interval / 1000) * 60);
+  let startTime: number;
+
+  const handleTimeTracker = (timeStamp: number) => {
+    if (!startTime) {
+      startTime = timeStamp;
+    }
+    setTimeTracker(() => {
+      currentTimer = ((timeStamp - startTime) / progress.interval) * 100;
+      return ((timeStamp - startTime) / progress.interval) * 100;
     });
 
     if (currentTimer < 100) {
       animationFrameId.current = requestAnimationFrame(handleTimeTracker);
     } else {
-      // if (currentId === stories.length - 1) {
-      //     allStoriesEndCallback();
-      // }
       animationFrameId.current &&
         cancelAnimationFrame(animationFrameId.current);
       console.log("INTERVAL OVER -> Go to next story");
-      // next();
     }
   };
 
   useEffect(() => {
     console.log("INSIDE PROGRESS COMPONENT");
     console.log({ progress });
-    if (progress.isMounted) {
+    if (progress.isMounted && !progress.isLoading) {
       animationFrameId.current = requestAnimationFrame(handleTimeTracker);
     }
-
     return () => {
       if (animationFrameId.current) {
         cancelAnimationFrame(animationFrameId.current);
@@ -76,7 +61,7 @@ const Progress = () => {
             <ProgressItem
               progress={
                 index === progress.currentIndex
-                  ? timeTracker
+                  ? currentTimer
                   : index < progress.currentIndex
                   ? 100
                   : 0
