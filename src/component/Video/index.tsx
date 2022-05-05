@@ -1,5 +1,6 @@
 import { useRecoilState } from "recoil";
-import progressAtom from "../../recoil/atoms/progress.atom";
+import statusAtom from "../../recoil/atoms/status.atom";
+import timerAtom from "../../recoil/atoms/timer.atoms";
 import { Video as VideoSC, VideoContainer } from "./styles";
 import Loader from "../Loader";
 import { useEffect, useRef } from "react";
@@ -12,26 +13,43 @@ export interface IVideoProps {
 
 const Video = ({ vidUrl, videoStyle, videoContainerStyle }: IVideoProps) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const [progress, setProgress] = useRecoilState(progressAtom);
+  const [status, setStatus] = useRecoilState(statusAtom);
+  const [timer, setTimer] = useRecoilState(timerAtom);
 
   const handleVideoLoad = (status: boolean, duration?: number) => {
-    setProgress((prev) => ({
+    setStatus((prev) => ({
       ...prev,
-      interval: duration ? duration * 1000 : prev.interval,
       isLoading: status,
       isMounted: true,
+    }));
+    setTimer((prev) => ({
+      ...prev,
+      interval: duration ? duration * 1000 : prev.interval,
     }));
   };
 
   useEffect(() => {
     if (videoRef.current) {
+      if (status.isLoading && !status.isMounted) {
+        setStatus((prev) => ({
+          ...prev,
+          isMounted: true,
+          isLoading: false,
+        }));
+        setTimer((prev) => ({
+          ...prev,
+          interval: videoRef.current?.duration
+            ? videoRef.current?.duration * 1000
+            : prev.interval,
+        }));
+      }
       videoRef.current.currentTime = 0;
     }
-  }, [progress]);
+  }, [status]);
 
   return (
     <>
-      {progress.isLoading && <Loader />}
+      {status.isLoading && <Loader />}
       <VideoContainer style={videoContainerStyle}>
         <VideoSC
           ref={videoRef}

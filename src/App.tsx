@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { Story } from "./model/story.model";
 import Stories from "./pages/Stories";
 
 function App() {
-  const staticStories: Story[] = [
+  const [mock, setMock] = useState<number>(0);
+  const staticStories1: Story[] = [
     {
       url: "https://picsum.photos/1080/1920",
       type: "img",
@@ -23,11 +25,17 @@ function App() {
       url: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
       type: "video",
     },
+    {
+      url: "  http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+      type: "video",
+    },
   ];
 
   return (
     <Stories
-      stories={staticStories}
+      stories={staticStories1}
+      loop={false}
+      
     />
   );
 }

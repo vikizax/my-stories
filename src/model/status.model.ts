@@ -1,8 +1,6 @@
-export interface Progress {
+export interface Status {
     currentIndex: number;
     total: number;
-    interval: number;
-    isPaused: boolean;
     isLoading: boolean;
     isMounted: boolean;
     status: 'playing' | 'paused' | 'stopped';

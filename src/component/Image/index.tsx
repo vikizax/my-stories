@@ -1,7 +1,8 @@
 import { useRecoilState } from "recoil";
 import Loader from "../Loader";
-import progressAtom from "../../recoil/atoms/progress.atom";
+import statusAtom from "../../recoil/atoms/status.atom";
 import { ImageContainer, Image as ImageSC } from "./styles";
+import { useRef } from "react";
 
 export interface IImageProps {
   imgUrl: string;
@@ -10,17 +11,19 @@ export interface IImageProps {
 }
 
 const Image = ({ imgUrl, imageContainerStyle, imageStyle }: IImageProps) => {
-  const [progress, setProgress] = useRecoilState(progressAtom);
+  const imageRef = useRef<HTMLImageElement | null>(null);
+  const [status, setstatus] = useRecoilState(statusAtom);
 
   const handleImageLoad = (status: boolean) => {
-    setProgress((prev) => ({ ...prev, isLoading: status, isMounted: true }));
+    setstatus((prev) => ({ ...prev, isLoading: status, isMounted: true }));
   };
 
   return (
     <>
-      {progress.isLoading && <Loader />}
+      {status.isLoading && <Loader />}
       <ImageContainer style={imageContainerStyle}>
         <ImageSC
+          ref={imageRef}
           src={imgUrl}
           onLoad={() => handleImageLoad(false)}
           style={imageStyle}

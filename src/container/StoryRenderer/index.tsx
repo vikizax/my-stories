@@ -1,24 +1,30 @@
-import { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import Image from "../../component/Image";
 import Video from "../../component/Video";
 import storyAtom from "../../recoil/atoms/story.atom";
-import progressAtom from "../../recoil/atoms/progress.atom";
+import statusAtom from "../../recoil/atoms/status.atom";
+import Loader from "../../component/Loader";
 
-const StoryRenderer = () => {
+interface IStoryRendererProps {
+  displayLoader?: boolean;
+}
+
+const StoryRenderer = ({ displayLoader }: IStoryRendererProps) => {
   const story = useRecoilValue(storyAtom);
-  const progress = useRecoilValue(progressAtom);
+  const status = useRecoilValue(statusAtom);
+
+  if (displayLoader) return <Loader />;
 
   return story.stories.length > 0 &&
-    story.stories[progress.currentIndex].type === "img" ? (
+    story.stories[status.currentIndex].type === "img" ? (
     <Image
-      imgUrl={story.stories[progress.currentIndex]?.url!}
+      imgUrl={story.stories[status.currentIndex]?.url!}
       imageStyle={story.imageStyle}
       imageContainerStyle={story.imageContainerStyle}
     />
   ) : (
     <Video
-      vidUrl={story.stories[progress.currentIndex]?.url!}
+      vidUrl={story.stories[status.currentIndex]?.url!}
       videoStyle={story.videoStyle}
       videoContainerStyle={story.videoContainerStyle}
     />

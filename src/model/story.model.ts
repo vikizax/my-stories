@@ -15,4 +15,6 @@ export interface StoryModel {
     videoContainerStyle?: CSSProperties;
     interval?: number;
     storyBodyStyle?: CSSProperties;
+    loop?: boolean,
+    displayLoader?: boolean;
 }

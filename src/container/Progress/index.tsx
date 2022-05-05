@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
-import storyAtom from "../../recoil/atoms/story.atom";
-import progressAtom from "../../recoil/atoms/progress.atom";
+import statusAtom from "../../recoil/atoms/status.atom";
+import timerAtom from "../../recoil/atoms/timer.atoms";
 import { storiesSelector } from "../../recoil/selectors/story.selector";
 import { useRecoilState, useRecoilValue } from "recoil";
 import {
@@ -8,29 +8,34 @@ import {
   ProgressItem,
   ProgressWrapperContainer,
 } from "./styles";
+import { DEFAULT_INTERVAL } from "../../constant";
 
 const Progress = () => {
   const story = useRecoilValue(storiesSelector);
-  const [progress, setProgress] = useRecoilState(progressAtom);
-  const [timeTracker, setTimeTracker] = useState<number>(0);
+  const [status, setStatus] = useRecoilState(statusAtom);
+  const [timer, setTimer] = useRecoilState(timerAtom);
   const [currentIndexTracker, setCurrentIndexTracker] = useState<number>(
-    progress.currentIndex
+    status.currentIndex
   );
+  const [isPaused, setIsPaused] = useState<boolean>(false);
   let animationFrameId = useRef<number>();
-  let currentTimer = timeTracker;
+  let currentTimer = timer.timeTracker;
   let startTime: number;
 
   const handleStoryAutoPlay = () => {
     // if the story current index is less then the total, go to next story
-    if (currentIndexTracker < progress.total - 1) {
+    if (status.currentIndex < status.total - 1) {
       const idx = currentIndexTracker;
-      setCurrentIndexTracker(progress.currentIndex + 1);
-      setProgress((prev) => ({
+      setStatus((prev) => ({
         ...prev,
         currentIndex: prev.currentIndex + 1,
         isLoading: true,
         isMounted: false,
-        interval: story[idx + 1].type === "img" ? 6000 : prev.interval,
+      }));
+      setTimer((prev) => ({
+        interval:
+          story[idx + 1].type === "img" ? DEFAULT_INTERVAL : prev.interval,
+        timeTracker: 0,
       }));
     }
   };
@@ -42,9 +47,12 @@ const Progress = () => {
     }
 
     // calculate the time difference between start and now
-    setTimeTracker(() => {
-      currentTimer = ((timeStamp - startTime) / progress.interval) * 100;
-      return ((timeStamp - startTime) / progress.interval) * 100;
+    setTimer((prev) => {
+      currentTimer = ((timeStamp - startTime) / timer.interval) * 100;
+      return {
+        ...prev,
+        timeTracker: ((timeStamp - startTime) / prev.interval) * 100,
+      };
     });
 
     // if the animation reaches 100%, stop the timer
@@ -58,15 +66,10 @@ const Progress = () => {
 
   useEffect(() => {
     currentTimer = 0;
-    setTimeTracker(0);
-    setCurrentIndexTracker(progress.currentIndex);
-    if (animationFrameId.current) {
-      cancelAnimationFrame(animationFrameId.current);
-    }
-  }, [progress, story]);
-
-  useEffect(() => {
-    if (progress.isMounted && !progress.isLoading) {
+    setTimer((prev) => ({ ...prev, timeTracker: 0 }));
+    if (status.isMounted && !status.isLoading) {
+      setIsPaused(false);
+      setCurrentIndexTracker(status.currentIndex);
       animationFrameId.current = requestAnimationFrame(handleTimeTracker);
     }
     return () => {
@@ -74,7 +77,7 @@ const Progress = () => {
         cancelAnimationFrame(animationFrameId.current);
       }
     };
-  }, [progress]);
+  }, [status]);
 
   return (
     <ProgressContainer>
@@ -88,9 +91,9 @@ const Progress = () => {
           <ProgressItem
             //@ts-ignore
             scale={
-              index === currentIndexTracker
-                ? timeTracker
-                : index < progress.currentIndex
+              index === status.currentIndex
+                ? timer.timeTracker
+                : index < status.currentIndex
                 ? 100
                 : 0
             }

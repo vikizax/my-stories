@@ -1,26 +1,26 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 import StoryRenderer from "../../container/StoryRenderer";
 import { StoryModel } from "../../model/story.model";
 import { StoryBody, StoryControlsOverlay, StoryControls } from "./styles";
 import { useSetRecoilState, useRecoilState, useRecoilValue } from "recoil";
 import storyAtom from "../../recoil/atoms/story.atom";
+import timerAtom from "../../recoil/atoms/timer.atoms";
 import { storiesSelector } from "../../recoil/selectors/story.selector";
-import progressAtom from "../../recoil/atoms/progress.atom";
+import statusAtom from "../../recoil/atoms/status.atom";
 import Progress from "../../container/Progress";
 import { DEFAULT_INTERVAL } from "../../constant";
-import { useDebounce } from "../../custom-hooks/useDebounce";
+import Close from "../../component/Close";
 
 const Stories = (props: StoryModel) => {
   const setStory = useSetRecoilState(storyAtom);
   const stories = useRecoilValue(storiesSelector);
-  const [progress, setProgress] = useRecoilState(progressAtom);
-  const [isPaused, setIsPaused] = useState<boolean>(false);
-
-  const debounceIsPaused = useDebounce(isPaused, 300);
+  const setTimer = useSetRecoilState(timerAtom);
+  const [status, setStatus] = useRecoilState(statusAtom);
+  const pauseRef = useRef<any>(null);
 
   useEffect(() => {
     setStory(props);
-    setProgress((prev) => ({
+    setStatus((prev) => ({
       ...prev,
       isLoading: true,
       isMounted: false,
@@ -28,63 +28,78 @@ const Stories = (props: StoryModel) => {
     }));
   }, [props]);
 
-  useEffect(() => {
-    console.log(debounceIsPaused);
-    if (debounceIsPaused) {
-      console.log("PAUSED!!");
-    }
-  }, [debounceIsPaused]);
+  const debouncePause = (e: React.MouseEvent | React.TouchEvent) => {
+    pauseRef.current = setTimeout(() => {
+      console.log('PAUSED')
+      setStatus((prev) => ({ ...prev, isPaused: true, status: "paused" }));
+    }, 200);
+  };
 
   const handleLeft = () => {
-    if (progress.isMounted && !progress.isLoading && progress.currentIndex > 0)
-      setProgress((prev) => ({
+    if (status.currentIndex > 0) {
+      setTimer((prev) => ({
+        ...prev,
+        interval:
+          stories[status.currentIndex - 1].type === "img"
+            ? DEFAULT_INTERVAL
+            : prev.interval,
+      }));
+      setStatus((prev) => ({
         ...prev,
         currentIndex: prev.currentIndex - 1,
         isLoading: true,
         isMounted: false,
-        interval:
-          stories[prev.currentIndex - 1].type === "img"
-            ? DEFAULT_INTERVAL
-            : prev.interval,
       }));
+    }
   };
 
   const handleRight = () => {
-    if (
-      progress.isMounted &&
-      !progress.isLoading &&
-      progress.currentIndex < progress.total - 1
-    )
-      setProgress((prev) => ({
+    if (status.currentIndex < status.total - 1) {
+      setTimer((prev) => ({
+        ...prev,
+        interval:
+          stories[status.currentIndex + 1].type === "img"
+            ? DEFAULT_INTERVAL
+            : prev.interval,
+      }));
+      setStatus((prev) => ({
         ...prev,
         currentIndex: prev.currentIndex + 1,
         isLoading: true,
         isMounted: false,
-        interval:
-          stories[prev.currentIndex + 1].type === "img"
-            ? DEFAULT_INTERVAL
-            : prev.interval,
       }));
+    }
   };
+
+  const mouseUp =
+    (type: "next" | "previous") => (e: React.MouseEvent | React.TouchEvent) => {
+      e.preventDefault();
+      pauseRef.current && clearTimeout(pauseRef.current);
+      if (status.status === "paused") {
+        setStatus((prev) => ({ ...prev, status: "playing" }));
+      } else {
+        type === "next" && handleRight();
+        type === "previous" && handleLeft();
+      }
+    };
 
   return (
     <StoryBody style={props.storyBodyStyle}>
+      <Close />
       <Progress />
-      <StoryRenderer />
+      <StoryRenderer displayLoader={props.displayLoader} />
       <StoryControlsOverlay>
         <StoryControls
-          onTouchStart={() => {
-            setIsPaused(true);
-          }}
-          onTouchEnd={() => handleLeft()}
-          onMouseDown={() => console.log("pause action")}
-          onMouseUp={() => handleLeft()}
+          onMouseDown={debouncePause}
+          onMouseUp={mouseUp("previous")}
+          onTouchStart={debouncePause}
+          onTouchEnd={mouseUp("previous")}
         />
         <StoryControls
-          onTouchStart={() => console.log("pause action")}
-          onTouchEnd={() => handleRight()}
-          onMouseDown={() => console.log("pause action")}
-          onMouseUp={() => handleRight()}
+          onMouseDown={debouncePause}
+          onMouseUp={mouseUp("next")}
+          onTouchStart={debouncePause}
+          onTouchEnd={mouseUp("next")}
         />
       </StoryControlsOverlay>
     </StoryBody>
