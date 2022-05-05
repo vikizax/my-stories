@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import storyAtom from "../../recoil/atoms/story.atom";
 import progressAtom from "../../recoil/atoms/progress.atom";
+import { storiesSelector } from "../../recoil/selectors/story.selector";
 import { useRecoilState, useRecoilValue } from "recoil";
 import {
   ProgressContainer,
@@ -9,7 +10,7 @@ import {
 } from "./styles";
 
 const Progress = () => {
-  const story = useRecoilValue(storyAtom);
+  const story = useRecoilValue(storiesSelector);
   const [progress, setProgress] = useRecoilState(progressAtom);
   const [timeTracker, setTimeTracker] = useState<number>(0);
   const [currentIndexTracker, setCurrentIndexTracker] = useState<number>(
@@ -22,12 +23,14 @@ const Progress = () => {
   const handleStoryAutoPlay = () => {
     // if the story current index is less then the total, go to next story
     if (currentIndexTracker < progress.total - 1) {
+      const idx = currentIndexTracker;
       setCurrentIndexTracker(progress.currentIndex + 1);
       setProgress((prev) => ({
         ...prev,
         currentIndex: prev.currentIndex + 1,
         isLoading: true,
         isMounted: false,
+        interval: story[idx + 1].type === "img" ? 6000 : prev.interval,
       }));
     }
   };
@@ -60,7 +63,7 @@ const Progress = () => {
     if (animationFrameId.current) {
       cancelAnimationFrame(animationFrameId.current);
     }
-  }, [progress]);
+  }, [progress, story]);
 
   useEffect(() => {
     if (progress.isMounted && !progress.isLoading) {
@@ -75,27 +78,26 @@ const Progress = () => {
 
   return (
     <ProgressContainer>
-      {story.stories.mode === "static" &&
-        story.stories.static!.map((item, index) => (
-          <ProgressWrapperContainer
-            style={{
-              width: `${100 / story.stories.static!.length}%`,
-            }}
-            key={`progress-wrapper-${index}`}
-          >
-            <ProgressItem
-              //@ts-ignore
-              scale={
-                index === currentIndexTracker
-                  ? timeTracker
-                  : index < progress.currentIndex
-                  ? 100
-                  : 0
-              }
-              key={`progress-${index}`}
-            />
-          </ProgressWrapperContainer>
-        ))}
+      {story.map((_, index) => (
+        <ProgressWrapperContainer
+          style={{
+            width: `${100 / story.length}%`,
+          }}
+          key={`progress-wrapper-${index}`}
+        >
+          <ProgressItem
+            //@ts-ignore
+            scale={
+              index === currentIndexTracker
+                ? timeTracker
+                : index < progress.currentIndex
+                ? 100
+                : 0
+            }
+            key={`progress-${index}`}
+          />
+        </ProgressWrapperContainer>
+      ))}
     </ProgressContainer>
   );
 };

@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
 import Loader from "../Loader";
 import progressAtom from "../../recoil/atoms/progress.atom";
@@ -14,7 +13,7 @@ const Image = ({ imgUrl, imageContainerStyle, imageStyle }: IImageProps) => {
   const [progress, setProgress] = useRecoilState(progressAtom);
 
   const handleImageLoad = (status: boolean) => {
-    setProgress((prev) => ({ ...prev, isLoading: false, isMounted: true }));
+    setProgress((prev) => ({ ...prev, isLoading: status, isMounted: true }));
   };
 
   return (

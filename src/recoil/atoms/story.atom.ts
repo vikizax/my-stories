@@ -1,17 +1,12 @@
-import { atom } from 'recoil';
-import { StoryModel } from '../../model/story.model';
+import { atom } from "recoil";
+import { StoryModel } from "../../model/story.model";
 
-export const StorynitialState: StoryModel =
-{
-    stories: {
-        mode: 'static',
-        static: []
-    }
-}
+export const StoryIntialState: StoryModel = {
+  stories: [],
+};
 const storyAtom = atom<StoryModel>({
-    key: 'storyAtom',
-    default: StorynitialState
+  key: "storyAtom",
+  default: StoryIntialState,
 });
 
 export default storyAtom;
-

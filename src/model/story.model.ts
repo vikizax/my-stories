@@ -8,14 +8,11 @@ export interface Story {
 }
 
 export interface StoryModel {
-    stories: {
-        static?: Story[];
-        api?: (...params: any[]) => Promise<Story[]>
-        mode: 'static' | 'api';
-    }
+    stories: Story[],
     imageStyle?: CSSProperties;
     videoStyle?: CSSProperties;
     imageContainerStyle?: CSSProperties;
     videoContainerStyle?: CSSProperties;
+    interval?: number;
     storyBodyStyle?: CSSProperties;
 }

@@ -19,14 +19,15 @@ function App() {
       url: "https://picsum.photos/1083/1923",
       type: "img",
     },
+    {
+      url: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+      type: "video",
+    },
   ];
-  
+
   return (
     <Stories
-      stories={{
-        mode: "static",
-        static: staticStories,
-      }}
+      stories={staticStories}
     />
   );
 }
