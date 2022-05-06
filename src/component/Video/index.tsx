@@ -3,7 +3,7 @@ import statusAtom from "../../recoil/atoms/status.atom";
 import timerAtom from "../../recoil/atoms/timer.atoms";
 import { Video as VideoSC, VideoContainer } from "./styles";
 import Loader from "../Loader";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export interface IVideoProps {
   vidUrl: string;
@@ -15,8 +15,10 @@ const Video = ({ vidUrl, videoStyle, videoContainerStyle }: IVideoProps) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [status, setStatus] = useRecoilState(statusAtom);
   const [timer, setTimer] = useRecoilState(timerAtom);
-
+  const [muted, setMuted] = useState<boolean>(true);
+  const [playing, setPlaying] = useState<boolean>(false);
   const handleVideoLoad = (status: boolean, duration?: number) => {
+    // setMuted(false);
     setStatus((prev) => ({
       ...prev,
       isLoading: status,
@@ -29,23 +31,35 @@ const Video = ({ vidUrl, videoStyle, videoContainerStyle }: IVideoProps) => {
   };
 
   useEffect(() => {
-    if (videoRef.current && status.status === "playing") {
+    let playPromise: Promise<void>;
+    if (vidUrl && videoRef.current && status.status === "playing") {
       setTimer((prev) => ({
         ...prev,
         interval: videoRef.current?.duration
           ? videoRef.current?.duration * 1000
           : prev.interval,
       }));
-
-      if (timer.timeTracker > 0)
-        videoRef.current.play().catch((err) => console.error(err));
-      else videoRef.current.currentTime = 0;
+      if (timer.timeTracker === 0) videoRef.current.currentTime = 0;
+      if (!playing) {
+        playPromise = videoRef.current.play();
+        setPlaying(true);
+        if (playPromise !== undefined) {
+          playPromise
+            .then((_) => {
+              setMuted(false);
+            })
+            .catch((error) => {
+              console.error(error);
+            });
+        }
+      }
     }
 
     if (videoRef.current && status.status === "paused") {
-      videoRef.current.pause();
+      setPlaying(false);
+      videoRef.current!.pause();
     }
-  }, [status]);
+  }, [status, videoRef]);
 
   return (
     <>
@@ -54,9 +68,9 @@ const Video = ({ vidUrl, videoStyle, videoContainerStyle }: IVideoProps) => {
         <VideoSC
           ref={videoRef}
           src={vidUrl}
-          autoPlay
-          controls={false}
-          playsInline
+          autoPlay={true}
+          // controls={false}
+          playsInline={true}
           webkit-playsInline="true"
           onLoadStart={() => handleVideoLoad(true)}
           onLoadedData={(e) => {
@@ -64,6 +78,7 @@ const Video = ({ vidUrl, videoStyle, videoContainerStyle }: IVideoProps) => {
             handleVideoLoad(false, e.target.duration);
           }}
           style={videoStyle}
+          muted={muted}
         />
       </VideoContainer>
     </>

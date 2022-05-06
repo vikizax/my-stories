@@ -6,27 +6,28 @@ function App() {
     {
       url: "https://picsum.photos/1080/1920",
       type: "img",
-      title: "Story Number 1",
+      description:
+        "Story Number 1, Lorem ipsum dolor sit amet consectetur adipisicing elit. Quasi non eos, necessitatibus placeat unde assumenda in voluptatem dolore voluptatibus adipisci facere debitis facilis cum voluptas deleniti quis enim maiores repudiandae? Lorem ipsum dolor sit amet consectetur adipisicing elit. Quasi non eos, necessitatibus placeat unde assumenda in voluptatem dolore voluptatibus adipisci facere debitis facilis cum voluptas deleniti quis enim maiores repudiandae?",
     },
     {
       url: "https://picsum.photos/1081/1921",
       type: "img",
-      title: "Story Number 2",
+      description: "Story Number 2",
     },
     {
       url: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
       type: "video",
-      title: "Story Number 3 | Video",
+      description: "Story Number 3 | Video",
     },
     {
       url: "https://picsum.photos/1082/1922",
       type: "img",
-      title: "Story Number 4",
+      description: "Story Number 4",
     },
     {
       url: "https://picsum.photos/1083/1923",
       type: "img",
-      title: "Story Number 5",
+      description: "Story Number 5",
     },
   ];
 

@@ -1,1 +1,1 @@
-export const DEFAULT_INTERVAL = 6000;
+export const DEFAULT_INTERVAL = 3000;

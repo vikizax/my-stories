@@ -26,4 +26,31 @@ export const HeadingContainer = styled.div`
   }
 `;
 
-export const DescriptionContainer = styled.div``;
+export const BottomContainer = styled.div`
+  position: absolute;
+  bottom: 0;
+  filter: drop-shadow(0 0px 3px rgba(0, 0, 0, 0.9));
+  height: ${pxToRem(150)};
+  width: 100%;
+  color: #fff;
+  overflow: auto;
+  z-index: 1000;
+  &::-webkit-scrollbar {
+    width: ${pxToRem(5)};
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #fff;
+    border-radius: ${pxToRem(4)};
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.2);
+  }
+`;
+
+export const TextContent = styled.div`
+  display: flex;
+  padding: 10px;
+  font-size: ${pxToRem(16)};
+  color: #fff;
+  text-align: center;
+`;
