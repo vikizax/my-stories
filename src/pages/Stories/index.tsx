@@ -14,7 +14,8 @@ import Close from "../../component/Close";
 const Stories = (props: StoryModel) => {
   const setStory = useSetRecoilState(storyAtom);
   const stories = useRecoilValue(storiesSelector);
-  const setTimer = useSetRecoilState(timerAtom);
+  // const setTimer = useSetRecoilState(timerAtom);
+  const [timer, setTimer] = useRecoilState(timerAtom);
   const [status, setStatus] = useRecoilState(statusAtom);
   const pauseRef = useRef<any>(null);
 
@@ -30,7 +31,6 @@ const Stories = (props: StoryModel) => {
 
   const debouncePause = (e: React.MouseEvent | React.TouchEvent) => {
     pauseRef.current = setTimeout(() => {
-      console.log('PAUSED')
       setStatus((prev) => ({ ...prev, isPaused: true, status: "paused" }));
     }, 200);
   };
@@ -38,11 +38,11 @@ const Stories = (props: StoryModel) => {
   const handleLeft = () => {
     if (status.currentIndex > 0) {
       setTimer((prev) => ({
-        ...prev,
         interval:
           stories[status.currentIndex - 1].type === "img"
             ? DEFAULT_INTERVAL
             : prev.interval,
+        timeTracker: 0,
       }));
       setStatus((prev) => ({
         ...prev,
@@ -50,17 +50,20 @@ const Stories = (props: StoryModel) => {
         isLoading: true,
         isMounted: false,
       }));
+    } else {
+      // start of the stories, get previous stories / call previous callback
+      !status.isLoading && props.previousCallback?.();
     }
   };
 
   const handleRight = () => {
     if (status.currentIndex < status.total - 1) {
       setTimer((prev) => ({
-        ...prev,
         interval:
           stories[status.currentIndex + 1].type === "img"
             ? DEFAULT_INTERVAL
             : prev.interval,
+        timeTracker: 0,
       }));
       setStatus((prev) => ({
         ...prev,
@@ -68,6 +71,10 @@ const Stories = (props: StoryModel) => {
         isLoading: true,
         isMounted: false,
       }));
+    } else {
+      // end of the stories, get new stories / call next callback
+
+      !status.isLoading && props.nextCallback?.();
     }
   };
 
@@ -85,8 +92,8 @@ const Stories = (props: StoryModel) => {
 
   return (
     <StoryBody style={props.storyBodyStyle}>
-      <Close />
-      <Progress />
+      <Close closeCallback={props.closeCallback} />
+      <Progress nextCallback={props.nextCallback} />
       <StoryRenderer displayLoader={props.displayLoader} />
       <StoryControlsOverlay>
         <StoryControls

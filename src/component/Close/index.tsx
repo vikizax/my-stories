@@ -1,11 +1,16 @@
+import { memo } from "react";
 import { ClsoeContainer, CloseIcon } from "./styles";
 
-const Close = () => {
+interface ICloseProps {
+  closeCallback?: () => void;
+}
+
+const Close = ({ closeCallback }: ICloseProps) => {
   return (
     <ClsoeContainer>
-      <CloseIcon />
+      <CloseIcon onClick={closeCallback} />
     </ClsoeContainer>
   );
 };
 
-export default Close;
+export default memo(Close);

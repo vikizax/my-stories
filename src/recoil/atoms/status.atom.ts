@@ -6,7 +6,7 @@ export const statusInitialState: Status = {
     total: 0,
     isLoading: false,
     isMounted: false,
-    status: 'stopped',
+    status: 'playing',
 }
 
 const statusAtom = atom<Status>({

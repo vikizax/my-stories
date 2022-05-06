@@ -10,17 +10,21 @@ import {
 } from "./styles";
 import { DEFAULT_INTERVAL } from "../../constant";
 
-const Progress = () => {
+interface IProgressProps {
+  nextCallback?: (...args: any[]) => void;
+  previousCallback?: (...args: any[]) => void;
+}
+
+const Progress = ({ nextCallback, previousCallback }: IProgressProps) => {
   const story = useRecoilValue(storiesSelector);
   const [status, setStatus] = useRecoilState(statusAtom);
   const [timer, setTimer] = useRecoilState(timerAtom);
   const [currentIndexTracker, setCurrentIndexTracker] = useState<number>(
     status.currentIndex
   );
-  const [isPaused, setIsPaused] = useState<boolean>(false);
+  const [startTime, setStartTime] = useState<number>();
   let animationFrameId = useRef<number>();
   let currentTimer = timer.timeTracker;
-  let startTime: number;
 
   const handleStoryAutoPlay = () => {
     // if the story current index is less then the total, go to next story
@@ -37,21 +41,24 @@ const Progress = () => {
           story[idx + 1].type === "img" ? DEFAULT_INTERVAL : prev.interval,
         timeTracker: 0,
       }));
+    } else {
+      // end of the stories, get new stories / call next callback
+      nextCallback?.();
     }
   };
 
   const handleTimeTracker = (timeStamp: number) => {
     // keep the start time
     if (!startTime) {
-      startTime = timeStamp;
+      setStartTime(timeStamp);
     }
 
     // calculate the time difference between start and now
     setTimer((prev) => {
-      currentTimer = ((timeStamp - startTime) / timer.interval) * 100;
+      currentTimer = prev.timeTracker + 100 / ((prev.interval / 1000) * 60);
       return {
         ...prev,
-        timeTracker: ((timeStamp - startTime) / prev.interval) * 100,
+        timeTracker: prev.timeTracker + 100 / ((prev.interval / 1000) * 60),
       };
     });
 
@@ -65,13 +72,17 @@ const Progress = () => {
   };
 
   useEffect(() => {
-    currentTimer = 0;
-    setTimer((prev) => ({ ...prev, timeTracker: 0 }));
+    if (status.status === "paused") {
+      animationFrameId.current &&
+        cancelAnimationFrame(animationFrameId.current);
+      return;
+    }
+
     if (status.isMounted && !status.isLoading) {
-      setIsPaused(false);
       setCurrentIndexTracker(status.currentIndex);
       animationFrameId.current = requestAnimationFrame(handleTimeTracker);
     }
+
     return () => {
       if (animationFrameId.current) {
         cancelAnimationFrame(animationFrameId.current);

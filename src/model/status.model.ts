@@ -3,5 +3,5 @@ export interface Status {
     total: number;
     isLoading: boolean;
     isMounted: boolean;
-    status: 'playing' | 'paused' | 'stopped';
+    status: 'playing' | 'paused'
 }

@@ -29,21 +29,21 @@ const Video = ({ vidUrl, videoStyle, videoContainerStyle }: IVideoProps) => {
   };
 
   useEffect(() => {
-    if (videoRef.current) {
-      if (status.isLoading && !status.isMounted) {
-        setStatus((prev) => ({
-          ...prev,
-          isMounted: true,
-          isLoading: false,
-        }));
-        setTimer((prev) => ({
-          ...prev,
-          interval: videoRef.current?.duration
-            ? videoRef.current?.duration * 1000
-            : prev.interval,
-        }));
-      }
-      videoRef.current.currentTime = 0;
+    if (videoRef.current && status.status === "playing") {
+      setTimer((prev) => ({
+        ...prev,
+        interval: videoRef.current?.duration
+          ? videoRef.current?.duration * 1000
+          : prev.interval,
+      }));
+
+      if (timer.timeTracker > 0)
+        videoRef.current.play().catch((err) => console.error(err));
+      else videoRef.current.currentTime = 0;
+    }
+
+    if (videoRef.current && status.status === "paused") {
+      videoRef.current.pause();
     }
   }, [status]);
 

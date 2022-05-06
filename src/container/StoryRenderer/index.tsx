@@ -4,6 +4,7 @@ import Video from "../../component/Video";
 import storyAtom from "../../recoil/atoms/story.atom";
 import statusAtom from "../../recoil/atoms/status.atom";
 import Loader from "../../component/Loader";
+import { HeadingContainer } from "./styles";
 
 interface IStoryRendererProps {
   displayLoader?: boolean;
@@ -15,20 +16,41 @@ const StoryRenderer = ({ displayLoader }: IStoryRendererProps) => {
 
   if (displayLoader) return <Loader />;
 
-  return story.stories.length > 0 &&
-    story.stories[status.currentIndex].type === "img" ? (
-    <Image
-      imgUrl={story.stories[status.currentIndex]?.url!}
-      imageStyle={story.imageStyle}
-      imageContainerStyle={story.imageContainerStyle}
-    />
-  ) : (
-    <Video
-      vidUrl={story.stories[status.currentIndex]?.url!}
-      videoStyle={story.videoStyle}
-      videoContainerStyle={story.videoContainerStyle}
-    />
+  return (
+    <>
+      <HeadingContainer>
+        {story.stories.length > 0 && story.stories[status.currentIndex].title}
+      </HeadingContainer>
+      {story.stories.length > 0 &&
+      story.stories[status.currentIndex].type === "img" ? (
+        <Image
+          imgUrl={story.stories[status.currentIndex]?.url!}
+          imageStyle={story.imageStyle}
+          imageContainerStyle={story.imageContainerStyle}
+        />
+      ) : (
+        <Video
+          vidUrl={story.stories[status.currentIndex]?.url!}
+          videoStyle={story.videoStyle}
+          videoContainerStyle={story.videoContainerStyle}
+        />
+      )}
+    </>
   );
 };
 
 export default StoryRenderer;
+// story.stories.length > 0 &&
+//     story.stories[status.currentIndex].type === "img" ? (
+//     <Image
+//       imgUrl={story.stories[status.currentIndex]?.url!}
+//       imageStyle={story.imageStyle}
+//       imageContainerStyle={story.imageContainerStyle}
+//     />
+//   ) : (
+//     <Video
+//       vidUrl={story.stories[status.currentIndex]?.url!}
+//       videoStyle={story.videoStyle}
+//       videoContainerStyle={story.videoContainerStyle}
+//     />
+//   );
