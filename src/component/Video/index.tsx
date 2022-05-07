@@ -50,6 +50,7 @@ const Video = ({ vidUrl, videoStyle, videoContainerStyle }: IVideoProps) => {
             })
             .catch((error) => {
               console.error(error);
+              videoRef.current?.play().finally(() => setMuted(false));
             });
         }
       }

@@ -93,7 +93,10 @@ const Stories = (props: StoryModel) => {
   return (
     <StoryBody style={props.storyBodyStyle}>
       <Close closeCallback={props.closeCallback} />
-      <Progress nextCallback={props.nextCallback} />
+      <Progress
+        nextCallback={props.nextCallback}
+        interval={props.interval ?? DEFAULT_INTERVAL}
+      />
       <StoryRenderer displayLoader={props.displayLoader} />
       <StoryControlsOverlay>
         <StoryControls
