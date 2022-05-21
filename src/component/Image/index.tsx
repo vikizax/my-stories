@@ -2,7 +2,7 @@ import { useRecoilState } from "recoil";
 import Loader from "../Loader";
 import statusAtom from "../../recoil/atoms/status.atom";
 import { ImageContainer, Image as ImageSC } from "./styles";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 export interface IImageProps {
   imgUrl: string;
@@ -17,6 +17,16 @@ const Image = ({ imgUrl, imageContainerStyle, imageStyle }: IImageProps) => {
   const handleImageLoad = (status: boolean) => {
     setstatus((prev) => ({ ...prev, isLoading: status, isMounted: true }));
   };
+
+  useEffect(() => {
+    if (
+      imageRef.current?.src === imgUrl &&
+      status.isLoading &&
+      !status.isMounted
+    ) {
+      setstatus((prev) => ({ ...prev, isLoading: false, isMounted: true }));
+    }
+  }, [status, imageRef]);
 
   return (
     <>

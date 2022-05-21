@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import StoryRenderer from "../../container/StoryRenderer";
 import { StoryModel } from "../../model/story.model";
 import { StoryBody, StoryControlsOverlay, StoryControls } from "./styles";
@@ -10,23 +10,38 @@ import statusAtom from "../../recoil/atoms/status.atom";
 import Progress from "../../container/Progress";
 import { DEFAULT_INTERVAL } from "../../constant";
 import Close from "../../component/Close";
+import refreshRate from "refresh-rate";
 
 const Stories = (props: StoryModel) => {
   const setStory = useSetRecoilState(storyAtom);
   const stories = useRecoilValue(storiesSelector);
-  // const setTimer = useSetRecoilState(timerAtom);
-  const [timer, setTimer] = useRecoilState(timerAtom);
+  const setTimer = useSetRecoilState(timerAtom);
   const [status, setStatus] = useRecoilState(statusAtom);
   const pauseRef = useRef<any>(null);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
+  const initialise = async () => {
+    setLoading(true);
+    const fps = await refreshRate({ sampleCount: 130 });
+    setLoading(false);
+
     setStory(props);
     setStatus((prev) => ({
       ...prev,
       isLoading: true,
       isMounted: false,
       total: props.stories.length ?? 0,
+      fps: fps,
     }));
+    setTimer((prev) => ({
+      ...prev,
+      timeTracker: 0,
+      interval: props.interval ?? DEFAULT_INTERVAL,
+    }));
+  };
+
+  useEffect(() => {
+    initialise();
   }, [props]);
 
   const debouncePause = (e: React.MouseEvent | React.TouchEvent) => {
@@ -40,7 +55,7 @@ const Stories = (props: StoryModel) => {
       setTimer((prev) => ({
         interval:
           stories[status.currentIndex - 1].type === "img"
-            ? DEFAULT_INTERVAL
+            ? props.interval ?? DEFAULT_INTERVAL
             : prev.interval,
         timeTracker: 0,
       }));
@@ -61,7 +76,7 @@ const Stories = (props: StoryModel) => {
       setTimer((prev) => ({
         interval:
           stories[status.currentIndex + 1].type === "img"
-            ? DEFAULT_INTERVAL
+            ? props.interval ?? DEFAULT_INTERVAL
             : prev.interval,
         timeTracker: 0,
       }));
@@ -97,7 +112,12 @@ const Stories = (props: StoryModel) => {
         nextCallback={props.nextCallback}
         interval={props.interval ?? DEFAULT_INTERVAL}
       />
-      <StoryRenderer displayLoader={props.displayLoader} />
+      <StoryRenderer
+        displayLoader={props.displayLoader || loading}
+        headingStyle={props.headingStyle}
+        bottomContainerStyle={props.bottomContainerStyle}
+        bottomTextStyle={props.bottomTextStyle}
+      />
       <StoryControlsOverlay>
         <StoryControls
           onMouseDown={debouncePause}

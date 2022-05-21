@@ -8,9 +8,17 @@ import { HeadingContainer, BottomContainer, TextContent } from "./styles";
 
 interface IStoryRendererProps {
   displayLoader?: boolean;
+  headingStyle?: React.CSSProperties;
+  bottomContainerStyle?: React.CSSProperties;
+  bottomTextStyle?: React.CSSProperties;
 }
 
-const StoryRenderer = ({ displayLoader }: IStoryRendererProps) => {
+const StoryRenderer = ({
+  displayLoader,
+  headingStyle,
+  bottomContainerStyle,
+  bottomTextStyle,
+}: IStoryRendererProps) => {
   const story = useRecoilValue(storyAtom);
   const status = useRecoilValue(statusAtom);
 
@@ -18,9 +26,11 @@ const StoryRenderer = ({ displayLoader }: IStoryRendererProps) => {
 
   return (
     <>
-      <HeadingContainer>
-        {story.stories.length > 0 && story.stories[status.currentIndex].title}
-      </HeadingContainer>
+      {story.stories.length > 0 && story.stories[status.currentIndex].title && (
+        <HeadingContainer style={headingStyle}>
+          {story.stories[status.currentIndex].title}
+        </HeadingContainer>
+      )}
       {story.stories.length > 0 &&
       story.stories[status.currentIndex].type === "img" ? (
         <Image
@@ -35,12 +45,14 @@ const StoryRenderer = ({ displayLoader }: IStoryRendererProps) => {
           videoContainerStyle={story.videoContainerStyle}
         />
       )}
-      <BottomContainer>
-        <TextContent>
-          {story.stories.length > 0 &&
-            story.stories[status.currentIndex].description}
-        </TextContent>
-      </BottomContainer>
+      {story.stories.length > 0 &&
+        story.stories[status.currentIndex].description && (
+          <BottomContainer style={bottomContainerStyle}>
+            <TextContent style={bottomTextStyle}>
+              {story.stories[status.currentIndex].description}
+            </TextContent>
+          </BottomContainer>
+        )}
     </>
   );
 };
