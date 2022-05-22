@@ -8,20 +8,21 @@ function App() {
       type: "img",
     },
     {
-      url: "https://picsum.photos/1081/1920",
+      url: "https://picsum.photos/1081/1921",
       type: "img",
       title: "hh",
     },
     {
-      url: "https://picsum.photos/1081/1920",
+      url: "https://picsum.photos/1081/1922",
       type: "img",
       description: "hh",
     },
     {
-      url: "https://picsum.photos/1081/1920",
+      url: "https://picsum.photos/1081/1923",
       type: "img",
       title: "hh",
-      description: "hh",
+      description:
+        "lorem, lorem, lorem, lorem, lorem, lorem,lorem, lorem lorem, lorem, lorem, lorem lorem, lorem, lorem, lorem lorem, lorem, lorem, lorem lorem, lorem, lorem, lorem lorem, lorem, lorem, lorem lorem, lorem, lorem, lorem lorem, lorem, lorem, loremlorem, lorem, lorem, lorem",
     },
   ];
 
@@ -38,6 +39,20 @@ function App() {
         console.log("CLOSE STORIES!!");
       }}
       interval={6000}
+      bottomContainerStyle={{
+        background: "unset",
+        display: "flex",
+        justifyContent: "center",
+      }}
+      bottomTextStyle={{
+        width: "fit-content",
+        height: "fit-content",
+        textAlign: "left",
+        fontFamily: "SW721CBold",
+        fontSize: "20px",
+        margin: "0 15px",
+        background: "#00000038",
+      }}
     />
   );
 }

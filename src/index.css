@@ -1,3 +1,16 @@
+@font-face {
+  font-family: "SW721CItalic";
+  src: url('./assets/font/SW721BCI.ttf') format('truetype');
+}
+@font-face {
+  font-family: "SW721C";
+  src: url('./assets/font/Swiss721CondensedBT.ttf') format('truetype');
+}
+@font-face {
+  font-family: "SW721CBold";
+  src: url('./assets/font/Swiss721BoldCondensedBT.ttf') format('truetype');
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
