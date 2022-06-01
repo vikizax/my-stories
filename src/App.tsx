@@ -1,7 +1,23 @@
+import { useState, useEffect } from "react";
 import { Story } from "./model/story.model";
 import Stories from "./pages/Stories";
-
+import refreshRate from "refresh-rate";
+import Loader from "./component/Loader";
 function App() {
+  const [loading, setLoading] = useState(false);
+  const [rRate, setRRate] = useState(60);
+  const updateRefreshRate = async () => {
+    setLoading(true);
+    const fps = await refreshRate({ sampleCount: 140 });
+    setLoading(false);
+    setRRate(fps);
+    console.log("updated refresh rate", fps);
+  };
+
+  useEffect(() => {
+    updateRefreshRate();
+  }, []);
+
   const staticStories1: Story[] = [
     {
       url: "https://picsum.photos/1080/1920",
@@ -21,12 +37,15 @@ function App() {
       url: "https://picsum.photos/1081/1923",
       type: "img",
       title: "hh",
-      description:
-        "lorem, lorem, lorem, lorem, lorem, lorem,lorem, lorem lorem, lorem, lorem, lorem lorem, lorem, lorem, lorem lorem, lorem, lorem, lorem lorem, lorem, lorem, lorem lorem, lorem, lorem, lorem lorem, lorem, lorem, lorem lorem, lorem, lorem, loremlorem, lorem, lorem, lorem",
+      description: "lorem",
     },
   ];
 
-  return (
+  console.log("will be called");
+
+  return loading ? (
+    <Loader />
+  ) : (
     <Stories
       stories={staticStories1}
       nextCallback={() => {
@@ -45,14 +64,13 @@ function App() {
         justifyContent: "center",
       }}
       bottomTextStyle={{
-        width: "fit-content",
-        height: "fit-content",
-        textAlign: "left",
+        width: "100%",
         fontFamily: "SW721CBold",
         fontSize: "20px",
-        margin: "0 15px",
         background: "#00000038",
       }}
+      refreshRate={rRate}
+      // displayLoader={loading}
     />
   );
 }

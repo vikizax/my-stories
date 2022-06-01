@@ -13,8 +13,11 @@ const Image = ({ imgUrl, imageContainerStyle, imageStyle }: IImageProps) => {
   const [status, setstatus] = useRecoilState(statusAtom);
 
   const handleImageLoad = (status: boolean) => {
+    console.log("image loaded", status);
     setstatus((prev) => ({ ...prev, isLoading: status, isMounted: true }));
   };
+
+  console.log("image component");
 
   return (
     <>
